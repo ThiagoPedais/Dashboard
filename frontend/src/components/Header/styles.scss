@@ -1,0 +1,15 @@
+.main-header-container {
+    padding-left: 30px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    background-color: var(--primary-color);
+}
+
+
+@media (min-width: 768px) {
+    .main-header-container {
+        padding-left: 55px;        
+    }
+
+}
