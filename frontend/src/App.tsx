@@ -1,6 +1,7 @@
 import './App.scss';
 import Filter from './components/Filter';
 import Header from './components/Header';
+import SalesByDate from './components/Sales-by-Date';
 
 function App() {
 
@@ -9,6 +10,7 @@ function App() {
             <Header />
             <div className="app-container">
                 <Filter />
+                <SalesByDate />
             </div>
         </>
     )
