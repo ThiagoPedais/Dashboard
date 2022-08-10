@@ -1,41 +1,52 @@
+import { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { chartOptions } from './helpers';
+import { ChartSeriesData, FilterData, SalesByDateType } from '../../types';
+import { formatDate, formatPrice } from '../../utils/formatters';
+import { makeRequest } from '../../utils/request';
+import { buildChartSeries, chartOptions, sumSalesByDate } from './helpers';
 
 import './styles.scss';
 
-const initalData = [
-    {
-        x: '2020-01-01',
-        y: 554
-    },
-    {
-        x: '2020-02-01',
-        y: 626
-    },
-    {
-        x: '2020-03-01',
-        y: 226
-    },
-    {
-        x: '2020-04-01',
-        y: 456
-    },
-    {
-        x: '2020-05-01',
-        y: 896
-    },
-];
+type Props = {
+    filterData?: FilterData;
+};
 
-export default function SalesByDate() {
+export default function SalesByDate({ filterData }: Props) {
+
+    const [chartSeries, setChartSeries] = useState<ChartSeriesData[]>([]);
+    const [totalSum, setTotalSum] = useState(0);
+
+    useEffect(() => {
+        makeRequest.get<SalesByDateType[]>('/sales/by-date?minDate=2017-01-01&maxDate=2017-01-31&gender=FEMALE')
+            .then((res) => {
+                const newChartSeries = buildChartSeries(res.data);
+                setChartSeries(newChartSeries);
+
+                const newTotalSum = sumSalesByDate(res.data);
+                setTotalSum(newTotalSum);
+                // console.log(res.data)
+            })
+            .catch((err) => {
+                console.error("Error to fetch sales by date")
+            });
+    }, []);
+
+
     return (
         <div className="sales-by-date-container base-card">
             <div className="">
                 <h4 className="sales-by-date-title">Evolução de vendas</h4>
-                <span className="sales-by-date-period">01/01/2017 a 31/01/2022</span>
+                {
+                    filterData?.dates && (
+                        <span className="sales-by-date-period">
+                            {formatDate(filterData?.dates?.[0])} até {formatDate(filterData?.dates?.[1])}
+                        </span>
+                    )
+                }
             </div>
             <div className="sales-by-date-data">
                 <div className="sales-by-date-quantity-container">
-                    <h2 className="sales-by-date-quantity">R$ 465.988,00</h2>
+                    <h2 className="sales-by-date-quantity">{formatPrice(totalSum)}</h2>
                     <span className="sales-by-date-quantity-label">Vendas no período</span>
                     <span className="sales-by-date-quantity-description">O gráfico mostra as vendas em todas as lojas</span>
                 </div>
@@ -43,7 +54,7 @@ export default function SalesByDate() {
                 <div className="sales-by-date-chart">
                     <ReactApexChart
                         options={chartOptions}
-                        series={[{ name: "vendas", data: initalData }]}
+                        series={[{ name: "vendas", data: chartSeries }]}
                         type="bar"
                         height={260}
                         with="100%"
