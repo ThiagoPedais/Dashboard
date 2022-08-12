@@ -18,6 +18,9 @@
             text-align: left;
             height: 55px;
         }
+        th:first-of-type {
+            padding-left: 30px;
+        }
     }
 
     tbody {
@@ -26,6 +29,9 @@
             height: 55px;
             font-size: 18px;
             transition: background .3s;
+        }
+        td:first-of-type {
+            padding-left: 30px;
         }
     }
     tbody tr:hover > td {

@@ -1,6 +1,48 @@
+import { useEffect, useMemo, useState } from 'react';
+import { FilterData, Gender, Sale, SalesResponse } from '../../types';
+import { formatDate, formatPrice } from '../../utils/formatters';
+import { buildFilterParams, makeRequest } from '../../utils/request';
 import './styles.scss';
 
-export default function SalesTable() {
+
+
+
+
+type Props = {
+    filterData?: FilterData;
+}
+
+const extraParams = {
+    page: 0,
+    size: 12,
+    sort: 'date,desc'
+}
+
+export default function SalesTable({ filterData }: Props) {
+
+    const [sales, setSales] = useState<Sale[]>();
+    const params = useMemo(() => buildFilterParams(filterData, extraParams), [filterData]);
+
+    useEffect(() => {
+        makeRequest.get<SalesResponse>('/sales', { params })
+            .then((res) => {
+                setSales(res.data.content);
+            })
+            .catch((err) => {
+                console.error("Error to fetch sales")
+            });
+    }, [params]);
+
+    const formatGender = (gender: Gender) => {
+        const textByGender = {
+            MALE: 'Masculino',
+            FEMALE: 'Feminino',
+            OTHER: 'Outros'
+        };
+
+        return textByGender[gender];
+    }
+
     return (
         <div className="sales-table-container base-card">
             <h3 className="sales-table-title">Vendas recentes</h3>
@@ -17,60 +59,21 @@ export default function SalesTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
-                    <tr>
-                        <td>#341</td>
-                        <td>07/11/1994</td>
-                        <td>Feminino</td>
-                        <td>Roupas e acessórios</td>
-                        <td>Uberlândia</td>
-                        <td>Crédito</td>
-                        <td>R$ 540,00</td>
-                    </tr>
+
+                    {
+                        sales?.map(sale => (
+                            <tr key={sale.id}>
+                                <td>#{sale.id}</td>
+                                <td>{formatDate(sale.date)}</td>
+                                <td>{formatGender(sale.gender)}</td>
+                                <td>{sale.categoryName}</td>
+                                <td>{sale.storeName}</td>
+                                <td>{sale.paymentMethod}</td>
+                                <td>{formatPrice(sale.total)}</td>
+                            </tr>
+                        ))
+                    }
+
                 </tbody>
             </table>
         </div>

@@ -19,7 +19,7 @@ export default function SalesByDate({ filterData }: Props) {
     const params = useMemo(() =>  buildFilterParams(filterData), [filterData]);
 
     useEffect(() => {
-        makeRequest.get<SalesByDateType[]>('sales/by-date', {params})
+        makeRequest.get<SalesByDateType[]>('sales/by-date', { params })
             .then((res) => {
                 const newChartSeries = buildChartSeries(res.data);
                 setChartSeries(newChartSeries);

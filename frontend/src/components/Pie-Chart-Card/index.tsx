@@ -4,13 +4,13 @@ import { buildPieChartConfig } from './helpers';
 import './styles.scss';
 
 type Props = {
-    labels: string[];
+    labels?: string[];
     name: string;
-    series: number[];
+    series?: number[];
 }
 
 
-export default function PieChartCard({ labels, name, series }: Props) {
+export default function PieChartCard({ labels = [], name, series = [] }: Props) {
     return (
         <div className="pie-chart-card base-card">
             <ReactApexChart
